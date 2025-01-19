@@ -11,21 +11,22 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import uk.tw.energy.domain.ElectricityReading;
 import uk.tw.energy.domain.PricePlan;
+import uk.tw.energy.service.impl.MeterReadingServiceImpl;
 
 @Service
 public class PricePlanService {
 
     private final List<PricePlan> pricePlans;
-    private final MeterReadingService meterReadingService;
+    private final MeterReadingServiceImpl meterReadingServiceImpl;
 
-    public PricePlanService(List<PricePlan> pricePlans, MeterReadingService meterReadingService) {
+    public PricePlanService(List<PricePlan> pricePlans, MeterReadingServiceImpl meterReadingServiceImpl) {
         this.pricePlans = pricePlans;
-        this.meterReadingService = meterReadingService;
+        this.meterReadingServiceImpl = meterReadingServiceImpl;
     }
 
     public Optional<Map<String, BigDecimal>> getConsumptionCostOfElectricityReadingsForEachPricePlan(
             String smartMeterId) {
-        Optional<List<ElectricityReading>> electricityReadings = meterReadingService.getReadings(smartMeterId);
+        Optional<List<ElectricityReading>> electricityReadings = meterReadingServiceImpl.getReadings(smartMeterId);
 
         if (!electricityReadings.isPresent()) {
             return Optional.empty();

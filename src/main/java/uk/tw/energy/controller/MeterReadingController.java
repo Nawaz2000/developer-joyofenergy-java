@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import uk.tw.energy.domain.ElectricityReading;
 import uk.tw.energy.domain.MeterReadings;
-import uk.tw.energy.service.MeterReadingService;
+import uk.tw.energy.service.impl.MeterReadingServiceImpl;
 
 @RestController
 @RequestMapping("readings/v1")
@@ -25,10 +25,10 @@ import uk.tw.energy.service.MeterReadingService;
 @Tag(name = "readings/v1")
 public class MeterReadingController {
 
-    private final MeterReadingService meterReadingService;
+    private final MeterReadingServiceImpl meterReadingServiceImpl;
 
-    public MeterReadingController(MeterReadingService meterReadingService) {
-        this.meterReadingService = meterReadingService;
+    public MeterReadingController(MeterReadingServiceImpl meterReadingService) {
+        this.meterReadingServiceImpl = meterReadingService;
     }
 
     @ApiResponses(
@@ -51,7 +51,7 @@ public class MeterReadingController {
         if (!isMeterReadingsValid(meterReadings)) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
-        meterReadingService.storeReadings(meterReadings.smartMeterId(), meterReadings.electricityReadings());
+        meterReadingServiceImpl.storeReadings(meterReadings.smartMeterId(), meterReadings.electricityReadings());
         return ResponseEntity.ok().build();
     }
 
@@ -80,10 +80,14 @@ public class MeterReadingController {
                         content = {@Content(mediaType = "application/json")})
             })
     @GetMapping("/read/{smartMeterId}")
-    public ResponseEntity readReadings(@PathVariable String smartMeterId) {
-        Optional<List<ElectricityReading>> readings = meterReadingService.getReadings(smartMeterId);
+    public ResponseEntity<List<ElectricityReading>> readReadings(@PathVariable String smartMeterId) {
+        Optional<List<ElectricityReading>> readings = meterReadingServiceImpl.getReadings(smartMeterId);
         return readings.isPresent()
                 ? ResponseEntity.ok(readings.get())
                 : ResponseEntity.notFound().build();
+
+        //        return readings.isPresent()
+        //                ? ResponseEntity.ok(readings.get())
+        //                : ResponseEntity.notFound().build();
     }
 }
