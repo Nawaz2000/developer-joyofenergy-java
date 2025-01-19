@@ -8,6 +8,7 @@ plugins {
     id("io.spring.dependency-management")
     id("com.github.ben-manes.versions")
     id("com.diffplug.spotless")
+    id("io.freefair.lombok") version "8.11"
 }
 
 java {

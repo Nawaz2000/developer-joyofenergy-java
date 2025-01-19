@@ -38,7 +38,7 @@ public class EndpointTest {
                 new MeterReadingsBuilder().generateElectricityReadings().build();
         HttpEntity<MeterReadings> entity = toHttpEntity(meterReadings);
 
-        ResponseEntity<String> response = restTemplate.postForEntity("/readings/store", entity, String.class);
+        ResponseEntity<String> response = restTemplate.postForEntity("/readings/v1/store", entity, String.class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
     }
@@ -54,7 +54,7 @@ public class EndpointTest {
         populateReadingsForMeter(smartMeterId, data);
 
         ResponseEntity<ElectricityReading[]> response =
-                restTemplate.getForEntity("/readings/read/" + smartMeterId, ElectricityReading[].class);
+                restTemplate.getForEntity("/readings/v1/read/" + smartMeterId, ElectricityReading[].class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(Arrays.asList(response.getBody())).isEqualTo(data);
@@ -98,7 +98,7 @@ public class EndpointTest {
         MeterReadings readings = new MeterReadings(smartMeterId, data);
 
         HttpEntity<MeterReadings> entity = toHttpEntity(readings);
-        restTemplate.postForEntity("/readings/store", entity, String.class);
+        restTemplate.postForEntity("/readings/v1/store", entity, String.class);
     }
 
     record CompareAllResponse(Map<String, Integer> pricePlanComparisons, String pricePlanId) {}
