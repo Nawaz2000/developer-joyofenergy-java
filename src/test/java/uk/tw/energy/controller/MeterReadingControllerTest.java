@@ -30,21 +30,21 @@ public class MeterReadingControllerTest {
     public void givenNoMeterIdIsSuppliedWhenStoringShouldReturnErrorResponse() {
         MeterReadings meterReadings = new MeterReadings(null, Collections.emptyList());
         assertThat(meterReadingController.storeReadings(meterReadings).getStatusCode())
-                .isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
+                .isEqualTo(HttpStatus.BAD_REQUEST);
     }
 
     @Test
     public void givenEmptyMeterReadingShouldReturnErrorResponse() {
         MeterReadings meterReadings = new MeterReadings(SMART_METER_ID, Collections.emptyList());
         assertThat(meterReadingController.storeReadings(meterReadings).getStatusCode())
-                .isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
+                .isEqualTo(HttpStatus.BAD_REQUEST);
     }
 
     @Test
     public void givenNullReadingsAreSuppliedWhenStoringShouldReturnErrorResponse() {
         MeterReadings meterReadings = new MeterReadings(SMART_METER_ID, null);
         assertThat(meterReadingController.storeReadings(meterReadings).getStatusCode())
-                .isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
+                .isEqualTo(HttpStatus.BAD_REQUEST);
     }
 
     @Test

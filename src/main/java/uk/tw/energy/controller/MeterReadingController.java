@@ -7,6 +7,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -27,6 +29,8 @@ public class MeterReadingController {
 
     private final MeterReadingServiceImpl meterReadingServiceImpl;
 
+    private final Logger LOGGER = LoggerFactory.getLogger(MeterReadingController.class);
+
     public MeterReadingController(MeterReadingServiceImpl meterReadingService) {
         this.meterReadingServiceImpl = meterReadingService;
     }
@@ -34,12 +38,12 @@ public class MeterReadingController {
     @ApiResponses(
             value = {
                 @ApiResponse(
-                        responseCode = "200",
-                        description = "Adds a meter reading",
+                        responseCode = "201",
+                        description = "Meter reading added successfully",
                         content = {@Content(mediaType = "application/json")}),
                 @ApiResponse(
                         responseCode = "400",
-                        description = "Input validation error",
+                        description = "Invalid input",
                         content = {@Content(mediaType = "application/json")}),
                 @ApiResponse(
                         responseCode = "500",
@@ -47,12 +51,17 @@ public class MeterReadingController {
                         content = {@Content(mediaType = "application/json")})
             })
     @PostMapping("/store")
-    public ResponseEntity storeReadings(@RequestBody MeterReadings meterReadings) {
+    public ResponseEntity<String> storeReadings(@RequestBody MeterReadings meterReadings) {
         if (!isMeterReadingsValid(meterReadings)) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            return ResponseEntity.badRequest().body("Invalid meter readings");
         }
-        meterReadingServiceImpl.storeReadings(meterReadings.smartMeterId(), meterReadings.electricityReadings());
-        return ResponseEntity.ok().build();
+        try {
+            meterReadingServiceImpl.storeReadings(meterReadings.smartMeterId(), meterReadings.electricityReadings());
+            return ResponseEntity.status(HttpStatus.CREATED).body("Meter readings stored successfully");
+        } catch (Exception e) {
+            LOGGER.error("Error storing meter readings", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error storing meter readings");
+        }
     }
 
     private boolean isMeterReadingsValid(MeterReadings meterReadings) {
@@ -85,9 +94,5 @@ public class MeterReadingController {
         return readings.isPresent()
                 ? ResponseEntity.ok(readings.get())
                 : ResponseEntity.notFound().build();
-
-        //        return readings.isPresent()
-        //                ? ResponseEntity.ok(readings.get())
-        //                : ResponseEntity.notFound().build();
     }
 }

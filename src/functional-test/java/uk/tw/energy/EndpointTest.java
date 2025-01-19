@@ -40,7 +40,7 @@ public class EndpointTest {
 
         ResponseEntity<String> response = restTemplate.postForEntity("/readings/v1/store", entity, String.class);
 
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
     }
 
     @SuppressWarnings("DataFlowIssue")
