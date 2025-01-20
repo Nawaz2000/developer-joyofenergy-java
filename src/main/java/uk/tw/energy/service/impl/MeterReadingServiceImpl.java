@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Optional;
 import org.springframework.stereotype.Service;
 import uk.tw.energy.domain.ElectricityReading;
+import uk.tw.energy.domain.MeterReadings;
 import uk.tw.energy.service.MeterReadingService;
 
 @Service
@@ -24,9 +25,19 @@ public class MeterReadingServiceImpl implements MeterReadingService {
 
     @Override
     public void storeReadings(String smartMeterId, List<ElectricityReading> electricityReadings) {
+        if (!isMeterReadingsValid(smartMeterId, electricityReadings))
+            throw new IllegalArgumentException("Invalid meter readings provided");
+
         if (!meterAssociatedReadings.containsKey(smartMeterId)) {
             meterAssociatedReadings.put(smartMeterId, new ArrayList<>());
         }
         meterAssociatedReadings.get(smartMeterId).addAll(electricityReadings);
+    }
+
+    private boolean isMeterReadingsValid(String smartMeterId, List<ElectricityReading> electricityReadings) {
+        return smartMeterId != null
+                && !smartMeterId.isEmpty()
+                && electricityReadings != null
+                && !electricityReadings.isEmpty();
     }
 }

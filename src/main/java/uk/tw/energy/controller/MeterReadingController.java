@@ -52,25 +52,8 @@ public class MeterReadingController {
             })
     @PostMapping("/store")
     public ResponseEntity<String> storeReadings(@RequestBody MeterReadings meterReadings) {
-        if (!isMeterReadingsValid(meterReadings)) {
-            return ResponseEntity.badRequest().body("Invalid meter readings");
-        }
-        try {
-            meterReadingServiceImpl.storeReadings(meterReadings.smartMeterId(), meterReadings.electricityReadings());
-            return ResponseEntity.status(HttpStatus.CREATED).body("Meter readings stored successfully");
-        } catch (Exception e) {
-            LOGGER.error("Error storing meter readings", e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error storing meter readings");
-        }
-    }
-
-    private boolean isMeterReadingsValid(MeterReadings meterReadings) {
-        String smartMeterId = meterReadings.smartMeterId();
-        List<ElectricityReading> electricityReadings = meterReadings.electricityReadings();
-        return smartMeterId != null
-                && !smartMeterId.isEmpty()
-                && electricityReadings != null
-                && !electricityReadings.isEmpty();
+        meterReadingServiceImpl.storeReadings(meterReadings.smartMeterId(), meterReadings.electricityReadings());
+        return ResponseEntity.status(HttpStatus.CREATED).body("Meter readings stored successfully");
     }
 
     @ApiResponses(
