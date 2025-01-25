@@ -15,8 +15,8 @@ import org.springframework.http.ResponseEntity;
 import uk.tw.energy.domain.ElectricityReading;
 import uk.tw.energy.domain.PricePlan;
 import uk.tw.energy.service.AccountService;
-import uk.tw.energy.service.PricePlanService;
 import uk.tw.energy.service.impl.MeterReadingServiceImpl;
+import uk.tw.energy.service.impl.PricePlanServiceImpl;
 
 public class PricePlanComparatorControllerTest {
     private static final String WORST_PLAN_ID = "worst-supplier";
@@ -35,11 +35,11 @@ public class PricePlanComparatorControllerTest {
         PricePlan pricePlan2 = new PricePlan(BEST_PLAN_ID, null, BigDecimal.ONE, null);
         PricePlan pricePlan3 = new PricePlan(SECOND_BEST_PLAN_ID, null, BigDecimal.valueOf(2), null);
         List<PricePlan> pricePlans = List.of(pricePlan1, pricePlan2, pricePlan3);
-        PricePlanService pricePlanService = new PricePlanService(pricePlans, meterReadingServiceImpl);
+        PricePlanServiceImpl pricePlanServiceImpl = new PricePlanServiceImpl(pricePlans, meterReadingServiceImpl);
 
         accountService = new AccountService(Map.of(SMART_METER_ID, WORST_PLAN_ID));
 
-        controller = new PricePlanComparatorController(pricePlanService, accountService);
+        controller = new PricePlanComparatorController(pricePlanServiceImpl, accountService);
     }
 
     @Test

@@ -23,6 +23,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handleException(Exception exception) {
         LOGGER.error("Internal server error", exception);
 
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error storing meter readings: " + exception.getMessage());
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body("Error storing meter readings: " + exception.getMessage());
     }
 }

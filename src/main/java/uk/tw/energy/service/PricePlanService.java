@@ -1,66 +1,18 @@
 package uk.tw.energy.service;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.time.Duration;
-import java.util.Comparator;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
-import org.springframework.stereotype.Service;
-import uk.tw.energy.domain.ElectricityReading;
-import uk.tw.energy.domain.PricePlan;
-import uk.tw.energy.service.impl.MeterReadingServiceImpl;
 
-@Service
-public class PricePlanService {
+public interface PricePlanService {
 
-    private final List<PricePlan> pricePlans;
-    private final MeterReadingServiceImpl meterReadingServiceImpl;
-
-    public PricePlanService(List<PricePlan> pricePlans, MeterReadingServiceImpl meterReadingServiceImpl) {
-        this.pricePlans = pricePlans;
-        this.meterReadingServiceImpl = meterReadingServiceImpl;
-    }
-
-    public Optional<Map<String, BigDecimal>> getConsumptionCostOfElectricityReadingsForEachPricePlan(
-            String smartMeterId) {
-        Optional<List<ElectricityReading>> electricityReadings = meterReadingServiceImpl.getReadings(smartMeterId);
-
-        if (!electricityReadings.isPresent()) {
-            return Optional.empty();
-        }
-
-        return Optional.of(pricePlans.stream()
-                .collect(Collectors.toMap(PricePlan::getPlanName, t -> calculateCost(electricityReadings.get(), t))));
-    }
-
-    private BigDecimal calculateCost(List<ElectricityReading> electricityReadings, PricePlan pricePlan) {
-        BigDecimal average = calculateAverageReading(electricityReadings);
-        BigDecimal timeElapsed = calculateTimeElapsed(electricityReadings);
-
-        BigDecimal averagedCost = average.divide(timeElapsed, RoundingMode.HALF_UP);
-        return averagedCost.multiply(pricePlan.getUnitRate());
-    }
-
-    private BigDecimal calculateAverageReading(List<ElectricityReading> electricityReadings) {
-        BigDecimal summedReadings = electricityReadings.stream()
-                .map(ElectricityReading::reading)
-                .reduce(BigDecimal.ZERO, (reading, accumulator) -> reading.add(accumulator));
-
-        return summedReadings.divide(BigDecimal.valueOf(electricityReadings.size()), RoundingMode.HALF_UP);
-    }
-
-    private BigDecimal calculateTimeElapsed(List<ElectricityReading> electricityReadings) {
-        ElectricityReading first = electricityReadings.stream()
-                .min(Comparator.comparing(ElectricityReading::time))
-                .get();
-
-        ElectricityReading last = electricityReadings.stream()
-                .max(Comparator.comparing(ElectricityReading::time))
-                .get();
-
-        return BigDecimal.valueOf(Duration.between(first.time(), last.time()).getSeconds() / 3600.0);
-    }
+    /**
+     * Retrieves the consumption cost of electricity readings for each available price plan.
+     *
+     * @param smartMeterId The unique identifier of the smart meter for which the readings are to be retrieved.
+     * @return An {@link Optional} containing a {@link Map} where the keys are the names of the price plans and the values are the
+     * calculated costs for the electricity readings associated with the respective price plans. If no readings are found for the
+     * given smart meter ID, the {@link Optional} will be empty.
+     */
+    Optional<Map<String, BigDecimal>> getConsumptionCostOfElectricityReadingsForEachPricePlan(String smartMeterId);
 }

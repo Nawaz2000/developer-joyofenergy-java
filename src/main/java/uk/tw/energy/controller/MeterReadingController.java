@@ -1,11 +1,14 @@
 package uk.tw.energy.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import java.util.Optional;
+
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,7 +27,7 @@ import uk.tw.energy.service.impl.MeterReadingServiceImpl;
 @RestController
 @RequestMapping("readings/v1")
 @Slf4j
-@Tag(name = "readings/v1")
+@Tag(name = "readings/v1", description = "API for managing meter readings")
 public class MeterReadingController {
 
     private final MeterReadingServiceImpl meterReadingServiceImpl;
@@ -35,6 +38,18 @@ public class MeterReadingController {
         this.meterReadingServiceImpl = meterReadingService;
     }
 
+    /**
+     * This function is responsible for storing electricity readings for a specific meter.
+     *
+     * @param meterReadings The object containing the smart meter ID and a list of electricity readings.
+     *                     The meterReadings object is expected to be valid and not null.
+     *
+     * @return A ResponseEntity object with a status code of 201 (CREATED) and a body containing the message
+     *         "Meter readings stored successfully". If any error occurs during the storage process,
+     *         a ResponseEntity object with a status code of 400 (BAD_REQUEST) or 500 (INTERNAL_SERVER_ERROR)
+     *         is returned.
+     */
+    @Operation(summary = "Store meter readings", description = "Stores electricity readings for a specific meter")
     @ApiResponses(
             value = {
                 @ApiResponse(
@@ -51,13 +66,28 @@ public class MeterReadingController {
                         content = {@Content(mediaType = "application/json")})
             })
     @PostMapping("/store")
-    public ResponseEntity<String> storeReadings(@RequestBody MeterReadings meterReadings) {
+    public ResponseEntity<String> storeReadings(@RequestBody @Valid MeterReadings meterReadings) {
         logger.info("Received meter readings for meter: {}", meterReadings.smartMeterId());
         meterReadingServiceImpl.storeReadings(meterReadings.smartMeterId(), meterReadings.electricityReadings());
 
         return ResponseEntity.status(HttpStatus.CREATED).body("Meter readings stored successfully");
     }
 
+    /**
+     * This function retrieves electricity readings for a specific meter.
+     *
+     * @param smartMeterId The unique identifier of the meter for which readings are to be fetched.
+     *                     This parameter is expected to be a non-null, non-empty string.
+     *
+     * @return A ResponseEntity object containing a list of ElectricityReading objects.
+     *         If readings are found for the specified meter, the status code will be 200 (OK)
+     *         and the list of readings will be present in the response body.
+     *         If no readings are found for the specified meter, the status code will be 404 (NOT_FOUND)
+     *         and the response body will be empty.
+     *         If any error occurs during the retrieval process, the status code will be 500 (INTERNAL_SERVER_ERROR)
+     *         and the response body will contain an error message.
+     */
+    @Operation(summary = "Fetch meter readings", description = "Fetches electricity readings for a specific meter")
     @ApiResponses(
             value = {
                 @ApiResponse(
@@ -67,6 +97,10 @@ public class MeterReadingController {
                 @ApiResponse(
                         responseCode = "400",
                         description = "Input validation error",
+                        content = {@Content(mediaType = "application/json")}),
+                @ApiResponse(
+                        responseCode = "404",
+                        description = "Meter not found",
                         content = {@Content(mediaType = "application/json")}),
                 @ApiResponse(
                         responseCode = "500",
@@ -80,6 +114,9 @@ public class MeterReadingController {
         Optional<List<ElectricityReading>> readings = meterReadingServiceImpl.getReadings(smartMeterId);
 
         return readings.map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.notFound().build());
+                .orElseGet(() -> {
+                    logger.warn("No readings found for meter: {}", smartMeterId);
+                    return ResponseEntity.notFound().build();
+                });
     }
 }

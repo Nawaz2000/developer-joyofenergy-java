@@ -24,6 +24,11 @@ public class SeedingApplicationDataConfiguration {
     private static final String RENEWABLES_PRICE_PLAN_ID = "price-plan-1";
     private static final String STANDARD_PRICE_PLAN_ID = "price-plan-2";
 
+    /**
+     * This method generates a list of predefined price plans for the energy application.
+     *
+     * @return A list of PricePlan objects, each representing a unique energy price plan.
+     */
     @Bean
     public List<PricePlan> pricePlans() {
         final List<PricePlan> pricePlans = new ArrayList<>();
@@ -33,6 +38,15 @@ public class SeedingApplicationDataConfiguration {
         return pricePlans;
     }
 
+    /**
+     * This method generates a map of electricity readings per smart meter.
+     *
+     * @return A map where the keys are smart meter IDs and the values are lists of ElectricityReading objects.
+     *         Each list contains 20 randomly generated ElectricityReading objects for the corresponding smart meter.
+     *
+     * @see ElectricityReading
+     * @see ElectricityReadingsGenerator
+     */
     @Bean
     public Map<String, List<ElectricityReading>> perMeterElectricityReadings() {
         final Map<String, List<ElectricityReading>> readings = new HashMap<>();
@@ -43,6 +57,14 @@ public class SeedingApplicationDataConfiguration {
         return readings;
     }
 
+    /**
+     * This method generates a mapping between smart meter IDs and their corresponding price plan IDs.
+     *
+     * @return A map where the keys are smart meter IDs and the values are the corresponding price plan IDs.
+     *         The map contains predefined associations between smart meters and price plans.
+     *
+     * @see PricePlan
+     */
     @Bean
     public Map<String, String> smartMeterToPricePlanAccounts() {
         final Map<String, String> smartMeterToPricePlanAccounts = new HashMap<>();
@@ -54,6 +76,17 @@ public class SeedingApplicationDataConfiguration {
         return smartMeterToPricePlanAccounts;
     }
 
+    /**
+     * This method provides a configured ObjectMapper instance for JSON serialization and deserialization.
+     * The ObjectMapper instance is configured to not write dates as timestamps.
+     *
+     * @param builder The Jackson2ObjectMapperBuilder instance used to create the ObjectMapper.
+     * @return A configured ObjectMapper instance for JSON serialization and deserialization.
+     *
+     * @see ObjectMapper
+     * @see Jackson2ObjectMapperBuilder
+     * @see SerializationFeature#WRITE_DATES_AS_TIMESTAMPS
+     */
     @Bean
     @Primary
     public ObjectMapper objectMapper(Jackson2ObjectMapperBuilder builder) {
