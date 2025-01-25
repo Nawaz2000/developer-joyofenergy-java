@@ -29,7 +29,7 @@ public class MeterReadingController {
 
     private final MeterReadingServiceImpl meterReadingServiceImpl;
 
-    private final Logger LOGGER = LoggerFactory.getLogger(MeterReadingController.class);
+    private final Logger logger = LoggerFactory.getLogger(MeterReadingController.class);
 
     public MeterReadingController(MeterReadingServiceImpl meterReadingService) {
         this.meterReadingServiceImpl = meterReadingService;
@@ -52,7 +52,9 @@ public class MeterReadingController {
             })
     @PostMapping("/store")
     public ResponseEntity<String> storeReadings(@RequestBody MeterReadings meterReadings) {
+        logger.info("Received meter readings for meter: {}", meterReadings.smartMeterId());
         meterReadingServiceImpl.storeReadings(meterReadings.smartMeterId(), meterReadings.electricityReadings());
+
         return ResponseEntity.status(HttpStatus.CREATED).body("Meter readings stored successfully");
     }
 
@@ -60,7 +62,7 @@ public class MeterReadingController {
             value = {
                 @ApiResponse(
                         responseCode = "200",
-                        description = "Feteches reading for a particular meter id",
+                        description = "Fetches reading for a particular meter id",
                         content = {@Content(mediaType = "application/json")}),
                 @ApiResponse(
                         responseCode = "400",
@@ -73,9 +75,11 @@ public class MeterReadingController {
             })
     @GetMapping("/read/{smartMeterId}")
     public ResponseEntity<List<ElectricityReading>> readReadings(@PathVariable String smartMeterId) {
+
+        logger.info("Fetching readings for meter: {}", smartMeterId);
         Optional<List<ElectricityReading>> readings = meterReadingServiceImpl.getReadings(smartMeterId);
-        return readings.isPresent()
-                ? ResponseEntity.ok(readings.get())
-                : ResponseEntity.notFound().build();
+
+        return readings.map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 }
