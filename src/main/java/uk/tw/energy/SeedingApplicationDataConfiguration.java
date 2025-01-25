@@ -9,6 +9,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -17,8 +21,11 @@ import uk.tw.energy.domain.ElectricityReading;
 import uk.tw.energy.domain.PricePlan;
 import uk.tw.energy.generator.ElectricityReadingsGenerator;
 
+@Slf4j
 @Configuration
 public class SeedingApplicationDataConfiguration {
+
+    private static final Logger logger = LoggerFactory.getLogger(SeedingApplicationDataConfiguration.class);
 
     private static final String MOST_EVIL_PRICE_PLAN_ID = "price-plan-0";
     private static final String RENEWABLES_PRICE_PLAN_ID = "price-plan-1";
@@ -31,10 +38,13 @@ public class SeedingApplicationDataConfiguration {
      */
     @Bean
     public List<PricePlan> pricePlans() {
+        logger.info("Generating price plans");
         final List<PricePlan> pricePlans = new ArrayList<>();
         pricePlans.add(new PricePlan(MOST_EVIL_PRICE_PLAN_ID, "Dr Evil's Dark Energy", BigDecimal.TEN, emptyList()));
         pricePlans.add(new PricePlan(RENEWABLES_PRICE_PLAN_ID, "The Green Eco", BigDecimal.valueOf(2), emptyList()));
         pricePlans.add(new PricePlan(STANDARD_PRICE_PLAN_ID, "Power for Everyone", BigDecimal.ONE, emptyList()));
+        logger.info("Generated {} price plans", pricePlans.size());
+
         return pricePlans;
     }
 
@@ -49,6 +59,7 @@ public class SeedingApplicationDataConfiguration {
      */
     @Bean
     public Map<String, List<ElectricityReading>> perMeterElectricityReadings() {
+        logger.info("Generating electricity readings");
         final Map<String, List<ElectricityReading>> readings = new HashMap<>();
         final ElectricityReadingsGenerator electricityReadingsGenerator = new ElectricityReadingsGenerator();
         smartMeterToPricePlanAccounts()
@@ -67,12 +78,15 @@ public class SeedingApplicationDataConfiguration {
      */
     @Bean
     public Map<String, String> smartMeterToPricePlanAccounts() {
+        logger.info("Generating smart meter to price plan associations");
         final Map<String, String> smartMeterToPricePlanAccounts = new HashMap<>();
         smartMeterToPricePlanAccounts.put("smart-meter-0", MOST_EVIL_PRICE_PLAN_ID);
         smartMeterToPricePlanAccounts.put("smart-meter-1", RENEWABLES_PRICE_PLAN_ID);
         smartMeterToPricePlanAccounts.put("smart-meter-2", MOST_EVIL_PRICE_PLAN_ID);
         smartMeterToPricePlanAccounts.put("smart-meter-3", STANDARD_PRICE_PLAN_ID);
         smartMeterToPricePlanAccounts.put("smart-meter-4", RENEWABLES_PRICE_PLAN_ID);
+        logger.info("Generated {} smart meter to price plan associations", smartMeterToPricePlanAccounts.size());
+
         return smartMeterToPricePlanAccounts;
     }
 
@@ -90,8 +104,11 @@ public class SeedingApplicationDataConfiguration {
     @Bean
     @Primary
     public ObjectMapper objectMapper(Jackson2ObjectMapperBuilder builder) {
+        logger.info("Configuring ObjectMapper");
         ObjectMapper objectMapper = builder.createXmlMapper(false).build();
         objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+        logger.info("Configured ObjectMapper");
+
         return objectMapper;
     }
 }
