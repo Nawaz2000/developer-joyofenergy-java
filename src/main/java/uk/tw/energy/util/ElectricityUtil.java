@@ -33,7 +33,11 @@ public class ElectricityUtil {
         BigDecimal average = calculateAverageReading(electricityReadings);
         BigDecimal timeElapsed = calculateTimeElapsed(electricityReadings);
         BigDecimal averagedCost = average.divide(timeElapsed, RoundingMode.HALF_UP);
-        return averagedCost.multiply(pricePlan.getUnitRate());
+        BigDecimal result = averagedCost.multiply(pricePlan.getUnitRate());
+
+        logger.info("Cost calculation: {}", result);
+
+        return result;
     }
 
     public static BigDecimal calculateAverageReading(List<ElectricityReading> electricityReadings) {
