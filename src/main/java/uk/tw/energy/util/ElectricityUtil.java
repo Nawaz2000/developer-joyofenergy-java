@@ -22,6 +22,13 @@ public class ElectricityUtil {
         // Private constructor to prevent instantiation
     }
 
+    /**
+     * Validates the smart meter ID and electricity readings list.
+     *
+     * @param smartMeterId The smart meter ID to validate.
+     * @param electricityReadings The list of electricity readings to validate.
+     * @return True if the smart meter ID and electricity readings list are valid; false otherwise.
+     */
     public static boolean isMeterReadingsValid(String smartMeterId, List<ElectricityReading> electricityReadings) {
         return smartMeterId != null
                 && !smartMeterId.isEmpty()
@@ -29,6 +36,14 @@ public class ElectricityUtil {
                 && !electricityReadings.isEmpty();
     }
 
+    /**
+     * Calculates the cost based on the average electricity reading and the time elapsed between readings,
+     * using the provided price plan's unit rate.
+     *
+     * @param electricityReadings The list of electricity readings to calculate the cost from.
+     * @param pricePlan The price plan to apply to the cost calculation.
+     * @return The calculated cost based on the given electricity readings and price plan.
+     */
     public static BigDecimal calculateCost(List<ElectricityReading> electricityReadings, PricePlan pricePlan) {
         BigDecimal average = calculateAverageReading(electricityReadings);
         BigDecimal timeElapsed = calculateTimeElapsed(electricityReadings);
@@ -40,6 +55,13 @@ public class ElectricityUtil {
         return result;
     }
 
+    /**
+     * Calculates the average electricity reading from a list of electricity readings.
+     *
+     * @param electricityReadings The list of electricity readings to calculate the average from.
+     * @return The average electricity reading as a BigDecimal. If the electricity readings list is empty,
+     * a warning message will be logged, and the function will return 0.
+     */
     public static BigDecimal calculateAverageReading(List<ElectricityReading> electricityReadings) {
         if (electricityReadings.isEmpty()) {
             logger.warn("Electricity readings list is empty, average calculation may result in an error");
@@ -52,6 +74,15 @@ public class ElectricityUtil {
         return summedReadings.divide(BigDecimal.valueOf(electricityReadings.size()), RoundingMode.HALF_UP);
     }
 
+    /**
+     * Calculates the time elapsed between the first and last electricity readings in the list,
+     * expressed in hours as a BigDecimal.
+     *
+     * @param electricityReadings The list of electricity readings to calculate the time elapsed from.
+     * @return The time elapsed between the first and last electricity readings in hours, as a BigDecimal.
+     * If the electricity readings list does not contain both first and last readings, a warning message
+     * will be logged, and the function will return 0.
+     */
     public static BigDecimal calculateTimeElapsed(List<ElectricityReading> electricityReadings) {
         Optional<ElectricityReading> firstOptional =
                 electricityReadings.stream().min(Comparator.comparing(ElectricityReading::time));

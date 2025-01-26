@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import uk.tw.energy.domain.ElectricityReading;
 import uk.tw.energy.domain.MeterReadings;
+import uk.tw.energy.domain.PricePlan;
 import uk.tw.energy.service.impl.MeterReadingServiceImpl;
 
 @RestController
@@ -114,6 +115,53 @@ public class MeterReadingController {
         Optional<List<ElectricityReading>> readings = meterReadingServiceImpl.getReadings(smartMeterId);
 
         return readings.map(ResponseEntity::ok)
+                .orElseGet(() -> {
+                    logger.warn("No readings found for meter: {}", smartMeterId);
+                    return ResponseEntity.notFound().build();
+                });
+    }
+
+    /**
+     * This function retrieves the usage cost for the last specified number of days for a specific meter.
+     *
+     * @param smartMeterId The unique identifier of the meter for which the usage cost is to be fetched.
+     *                     This parameter is expected to be a non-null, non-empty string.
+     * @param days The number of days for which the usage cost is to be calculated.
+     *             This parameter is expected to be a non-null, non-empty string.
+     *
+     * @return A ResponseEntity object containing a Double value representing the usage cost.
+     *         If usage cost is found for the specified meter and days, the status code will be 200 (OK)
+     *         and the cost will be present in the response body.
+     *         If no readings are found for the specified meter or days, the status code will be 404 (NOT_FOUND)
+     *         and the response body will be empty.
+     *         If any error occurs during the retrieval process, the status code will be 500 (INTERNAL_SERVER_ERROR)
+     *         and the response body will contain an error message.
+     */
+    @Operation(summary = "Fetch usage cost", description = "Fetches the usage cost for the last week for a specific meter")
+    @ApiResponses(
+            value = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Fetches reading for a particular meter id",
+                            content = {@Content(mediaType = "application/json")}),
+                    @ApiResponse(
+                            responseCode = "400",
+                            description = "Input validation error",
+                            content = {@Content(mediaType = "application/json")}),
+                    @ApiResponse(
+                            responseCode = "404",
+                            description = "Meter not found",
+                            content = {@Content(mediaType = "application/json")}),
+                    @ApiResponse(
+                            responseCode = "500",
+                            description = "Internal server error",
+                            content = {@Content(mediaType = "application/json")})
+            })
+    @GetMapping("/read-usage-cost/{smartMeterId}/{days}")
+    public ResponseEntity<Double> readUsageCost(@PathVariable String smartMeterId, @PathVariable String days) {
+        logger.info("Fetching usage cost for meter: {}", smartMeterId);
+        Optional<Double> usageCost = meterReadingServiceImpl.getUsageCostForRequiredDays(smartMeterId, days);
+        return usageCost.map(ResponseEntity::ok)
                 .orElseGet(() -> {
                     logger.warn("No readings found for meter: {}", smartMeterId);
                     return ResponseEntity.notFound().build();
