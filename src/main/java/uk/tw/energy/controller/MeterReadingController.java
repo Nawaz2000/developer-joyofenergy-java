@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import uk.tw.energy.domain.ElectricityReading;
 import uk.tw.energy.domain.MeterReadings;
-import uk.tw.energy.service.impl.MeterReadingServiceImpl;
+import uk.tw.energy.service.MeterReadingService;
 
 @RestController
 @RequestMapping("readings/v1")
@@ -30,12 +30,12 @@ import uk.tw.energy.service.impl.MeterReadingServiceImpl;
 @Tag(name = "readings/v1", description = "API for managing meter readings")
 public class MeterReadingController {
 
-    private final MeterReadingServiceImpl meterReadingServiceImpl;
+    private final MeterReadingService meterReadingService;
 
     private final Logger logger = LoggerFactory.getLogger(MeterReadingController.class);
 
-    public MeterReadingController(MeterReadingServiceImpl meterReadingService) {
-        this.meterReadingServiceImpl = meterReadingService;
+    public MeterReadingController(MeterReadingService meterReadingService) {
+        this.meterReadingService = meterReadingService;
     }
 
     /**
@@ -68,7 +68,7 @@ public class MeterReadingController {
     @PostMapping("/store")
     public ResponseEntity<String> storeReadings(@RequestBody @Valid MeterReadings meterReadings) {
         logger.info("Received meter readings for meter: {}", meterReadings.smartMeterId());
-        meterReadingServiceImpl.storeReadings(meterReadings.smartMeterId(), meterReadings.electricityReadings());
+        meterReadingService.storeReadings(meterReadings.smartMeterId(), meterReadings.electricityReadings());
 
         return ResponseEntity.status(HttpStatus.CREATED).body("Meter readings stored successfully");
     }
@@ -111,7 +111,7 @@ public class MeterReadingController {
     public ResponseEntity<List<ElectricityReading>> readReadings(@PathVariable String smartMeterId) {
 
         logger.info("Fetching readings for meter: {}", smartMeterId);
-        Optional<List<ElectricityReading>> readings = meterReadingServiceImpl.getReadings(smartMeterId);
+        Optional<List<ElectricityReading>> readings = meterReadingService.getReadings(smartMeterId);
 
         return readings.map(ResponseEntity::ok)
                 .orElseGet(() -> {
