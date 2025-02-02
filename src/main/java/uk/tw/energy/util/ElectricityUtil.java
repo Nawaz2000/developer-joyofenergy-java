@@ -6,7 +6,6 @@ import java.time.Duration;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
-
 import lombok.extern.slf4j.Slf4j;
 import uk.tw.energy.domain.ElectricityReading;
 import uk.tw.energy.domain.PricePlan;
@@ -93,7 +92,8 @@ public class ElectricityUtil {
             return BigDecimal.valueOf(
                     Duration.between(first.time(), last.time()).getSeconds() / 3600.0);
         } else {
-            log.warn("Electricity readings list does not contain both first and last readings, time elapsed calculation may result in an error");
+            log.warn(
+                    "Electricity readings list does not contain both first and last readings, time elapsed calculation may result in an error");
 
             return BigDecimal.ZERO;
         }

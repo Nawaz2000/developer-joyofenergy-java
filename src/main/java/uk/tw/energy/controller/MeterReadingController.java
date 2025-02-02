@@ -5,10 +5,9 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import java.util.List;
 import java.util.Optional;
-
-import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,8 +19,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import uk.tw.energy.domain.ElectricityReading;
 import uk.tw.energy.domain.MeterReadings;
-import uk.tw.energy.domain.PricePlan;
-import uk.tw.energy.service.impl.MeterReadingServiceImpl;
 import uk.tw.energy.service.MeterReadingService;
 
 @RestController
@@ -111,11 +108,10 @@ public class MeterReadingController {
         log.info("Fetching readings for meter: {}", smartMeterId);
         Optional<List<ElectricityReading>> readings = meterReadingService.getReadings(smartMeterId);
 
-        return readings.map(ResponseEntity::ok)
-                .orElseGet(() -> {
-                    log.warn("No readings found for meter: {}", smartMeterId);
-                    return ResponseEntity.notFound().build();
-                });
+        return readings.map(ResponseEntity::ok).orElseGet(() -> {
+            log.warn("No readings found for meter: {}", smartMeterId);
+            return ResponseEntity.notFound().build();
+        });
     }
 
     /**
@@ -134,34 +130,37 @@ public class MeterReadingController {
      *         If any error occurs during the retrieval process, the status code will be 500 (INTERNAL_SERVER_ERROR)
      *         and the response body will contain an error message.
      */
-    @Operation(summary = "Fetch usage cost", description = "Fetches the usage cost for the last week for a specific meter")
+    @Operation(
+            summary = "Fetch usage cost",
+            description = "Fetches the usage cost for the last week for a specific meter")
     @ApiResponses(
             value = {
-                    @ApiResponse(
-                            responseCode = "200",
-                            description = "Fetches reading for a particular meter id",
-                            content = {@Content(mediaType = "application/json")}),
-                    @ApiResponse(
-                            responseCode = "400",
-                            description = "Input validation error",
-                            content = {@Content(mediaType = "application/json")}),
-                    @ApiResponse(
-                            responseCode = "404",
-                            description = "Meter not found",
-                            content = {@Content(mediaType = "application/json")}),
-                    @ApiResponse(
-                            responseCode = "500",
-                            description = "Internal server error",
-                            content = {@Content(mediaType = "application/json")})
+                @ApiResponse(
+                        responseCode = "200",
+                        description = "Fetches reading for a particular meter id",
+                        content = {@Content(mediaType = "application/json")}),
+                @ApiResponse(
+                        responseCode = "400",
+                        description = "Input validation error",
+                        content = {@Content(mediaType = "application/json")}),
+                @ApiResponse(
+                        responseCode = "404",
+                        description = "Meter not found",
+                        content = {@Content(mediaType = "application/json")}),
+                @ApiResponse(
+                        responseCode = "500",
+                        description = "Internal server error",
+                        content = {@Content(mediaType = "application/json")})
             })
     @GetMapping("/read-usage-cost/{smartMeterId}/{days}")
     public ResponseEntity<Double> readUsageCost(@PathVariable String smartMeterId, @PathVariable String days) {
         log.info("Fetching usage cost for meter: {}", smartMeterId);
         Optional<Double> usageCost = meterReadingService.getUsageCostForRequiredDays(smartMeterId, days);
-        return usageCost.map(ResponseEntity::ok)
-                .orElseGet(() -> {
-                    log.warn("No readings found for meter: {}", smartMeterId);
-                    return ResponseEntity.notFound().build();
-                });
+
+        return usageCost.map(ResponseEntity::ok).orElseGet(() -> {
+            log.warn("No readings found for meter: {}", smartMeterId);
+
+            return ResponseEntity.notFound().build();
+        });
     }
 }

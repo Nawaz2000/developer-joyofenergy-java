@@ -1,15 +1,6 @@
 package uk.tw.energy.service.impl;
 
-import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import uk.tw.energy.domain.ElectricityReading;
-import uk.tw.energy.domain.PricePlan;
-import uk.tw.energy.service.AccountService;
-import uk.tw.energy.service.MeterReadingService;
-import uk.tw.energy.util.ElectricityUtil;
+import static uk.tw.energy.util.ElectricityUtil.isMeterReadingsValid;
 
 import java.math.BigDecimal;
 import java.time.Duration;
@@ -19,8 +10,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
-import static uk.tw.energy.util.ElectricityUtil.isMeterReadingsValid;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import uk.tw.energy.domain.ElectricityReading;
+import uk.tw.energy.domain.PricePlan;
+import uk.tw.energy.service.AccountService;
+import uk.tw.energy.service.MeterReadingService;
+import uk.tw.energy.util.ElectricityUtil;
 
 @Slf4j
 @Service
@@ -87,11 +84,10 @@ public class MeterReadingServiceImpl implements MeterReadingService {
                 .filter(currPlan -> currPlan.getPlanName().equals(pricePlanIdForSmartMeterId))
                 .findAny();
 
-        if (pricePlan.isEmpty())
-            return Optional.empty();
+        if (pricePlan.isEmpty()) return Optional.empty();
 
-        List<ElectricityReading> filteredReadings = electricityReadings
-                .orElse(List.of())
+        List<ElectricityReading> filteredReadings = electricityReadings.orElse(
+                List.of())
                 .stream()
                 .filter(reading -> reading.time().isAfter(Instant.now().minus(Duration.ofDays(Long.parseLong(days)))))
                 .collect(Collectors.toList());

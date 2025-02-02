@@ -22,4 +22,13 @@ public interface MeterReadingService {
      * @param electricityReadings the list of electricity readings to be stored
      */
     void storeReadings(String smartMeterId, List<ElectricityReading> electricityReadings);
+
+    /**
+     * Calculates the usage cost for a specific smart meter over a given number of days.
+     *
+     * @param smartMeterId the ID of the smart meter for which the usage cost is to be calculated
+     * @param days the number of days for which the usage cost is to be calculated
+     * @return an Optional containing the calculated usage cost as a double, or an empty Optional if the price plan for the smart meter ID is not found
+     */
+    Optional<Double> getUsageCostForRequiredDays(String smartMeterId, String days);
 }
