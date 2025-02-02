@@ -8,15 +8,11 @@ import java.util.List;
 import java.util.Optional;
 
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import uk.tw.energy.domain.ElectricityReading;
 import uk.tw.energy.domain.PricePlan;
 
 @Slf4j
 public class ElectricityUtil {
-
-    private static final Logger logger = LoggerFactory.getLogger(ElectricityUtil.class);
 
     private ElectricityUtil() {
         // Private constructor to prevent instantiation
@@ -35,14 +31,14 @@ public class ElectricityUtil {
         BigDecimal averagedCost = average.divide(timeElapsed, RoundingMode.HALF_UP);
         BigDecimal result = averagedCost.multiply(pricePlan.getUnitRate());
 
-        logger.info("Cost calculation: {}", result);
+        log.info("Cost calculation: {}", result);
 
         return result;
     }
 
     public static BigDecimal calculateAverageReading(List<ElectricityReading> electricityReadings) {
         if (electricityReadings.isEmpty()) {
-            logger.warn("Electricity readings list is empty, average calculation may result in an error");
+            log.warn("Electricity readings list is empty, average calculation may result in an error");
         }
 
         BigDecimal summedReadings = electricityReadings.stream()
@@ -66,7 +62,7 @@ public class ElectricityUtil {
             return BigDecimal.valueOf(
                     Duration.between(first.time(), last.time()).getSeconds() / 3600.0);
         } else {
-            logger.warn("Electricity readings list does not contain both first and last readings, time elapsed calculation may result in an error");
+            log.warn("Electricity readings list does not contain both first and last readings, time elapsed calculation may result in an error");
 
             return BigDecimal.ZERO;
         }

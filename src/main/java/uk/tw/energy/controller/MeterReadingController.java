@@ -10,8 +10,6 @@ import java.util.Optional;
 
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -31,8 +29,6 @@ import uk.tw.energy.service.MeterReadingService;
 public class MeterReadingController {
 
     private final MeterReadingService meterReadingService;
-
-    private final Logger logger = LoggerFactory.getLogger(MeterReadingController.class);
 
     public MeterReadingController(MeterReadingService meterReadingService) {
         this.meterReadingService = meterReadingService;
@@ -67,7 +63,7 @@ public class MeterReadingController {
             })
     @PostMapping("/store")
     public ResponseEntity<String> storeReadings(@RequestBody @Valid MeterReadings meterReadings) {
-        logger.info("Received meter readings for meter: {}", meterReadings.smartMeterId());
+        log.info("Received meter readings for meter: {}", meterReadings.smartMeterId());
         meterReadingService.storeReadings(meterReadings.smartMeterId(), meterReadings.electricityReadings());
 
         return ResponseEntity.status(HttpStatus.CREATED).body("Meter readings stored successfully");
@@ -110,12 +106,12 @@ public class MeterReadingController {
     @GetMapping("/read/{smartMeterId}")
     public ResponseEntity<List<ElectricityReading>> readReadings(@PathVariable String smartMeterId) {
 
-        logger.info("Fetching readings for meter: {}", smartMeterId);
+        log.info("Fetching readings for meter: {}", smartMeterId);
         Optional<List<ElectricityReading>> readings = meterReadingService.getReadings(smartMeterId);
 
         return readings.map(ResponseEntity::ok)
                 .orElseGet(() -> {
-                    logger.warn("No readings found for meter: {}", smartMeterId);
+                    log.warn("No readings found for meter: {}", smartMeterId);
                     return ResponseEntity.notFound().build();
                 });
     }
