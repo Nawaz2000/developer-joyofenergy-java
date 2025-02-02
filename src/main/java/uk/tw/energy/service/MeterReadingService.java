@@ -33,4 +33,6 @@ public interface MeterReadingService {
      *         usage (as BigDecimal) for each day. If there are no readings for the given smart meter, an empty Optional is returned.
      */
     Optional<Map<String, BigDecimal>> getDailyEnergyUsage(String smartMeterId);
+
+    Optional<Map<String, Map<String, BigDecimal>>> compareUsage(String smartMeterId);
 }

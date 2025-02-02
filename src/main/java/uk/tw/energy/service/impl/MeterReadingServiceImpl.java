@@ -4,10 +4,7 @@ import static uk.tw.energy.util.ElectricityUtil.isMeterReadingsValid;
 
 import java.math.BigDecimal;
 import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -78,5 +75,20 @@ public class MeterReadingServiceImpl implements MeterReadingService {
                         Collectors.reducing(BigDecimal.ZERO, ElectricityReading::reading, BigDecimal::add)));
 
         return Optional.of(dailyUsage);
+    }
+
+    @Override
+    public Optional<Map<String, Map<String, BigDecimal>>> compareUsage(String smartMeterId) {
+
+        Map<String, Map<String, BigDecimal>> collect = meterAssociatedReadings.entrySet().stream()
+                .collect(Collectors.toMap(x -> x.getKey(), entry -> entry.getValue().stream()
+                        .collect(Collectors.groupingBy(
+                                reading -> reading.time()
+                                        .atZone(ZoneId.systemDefault())
+                                        .toLocalDate()
+                                        .toString(),
+                                Collectors.reducing(BigDecimal.ZERO, ElectricityReading::reading, BigDecimal::add)))));
+
+        return Optional.of(collect);
     }
 }

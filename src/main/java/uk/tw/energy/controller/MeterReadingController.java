@@ -159,4 +159,46 @@ public class MeterReadingController {
             return ResponseEntity.notFound().build();
         });
     }
+
+    /**
+     * Compares energy usage for a specific meter.
+     *
+     * @param smartMeterId The unique identifier of the meter for which usage comparison is to be performed.
+     *                     This parameter is expected to be a non-null, non-empty string.
+     *
+     * @return A ResponseEntity object containing a map of usage comparisons.
+     *         If comparisons are found for the specified meter, the status code will be 200 (OK)
+     *         and the map of comparisons will be present in the response body.
+     *         If no comparisons are found for the specified meter, the status code will be 404 (NOT_FOUND)
+     *         and the response body will be empty.
+     *         If any error occurs during the comparison process, the status code will be 500 (INTERNAL_SERVER_ERROR)
+     *         and the response body will contain an error message.
+     */
+    @Operation(summary = "Compare energy usage", description = "Compares energy usage for a specific meter")
+    @ApiResponses(
+            value = {
+                @ApiResponse(
+                        responseCode = "200",
+                        description = "Usage comparison retrieved successfully",
+                        content = {@Content(mediaType = "application/json")}),
+                @ApiResponse(
+                        responseCode = "404",
+                        description = "No usage comparison found for the specified meter",
+                        content = {@Content(mediaType = "application/json")}),
+                @ApiResponse(
+                        responseCode = "500",
+                        description = "Internal server error",
+                        content = {@Content(mediaType = "application/json")})
+            })
+    @GetMapping("/compare-usage/{smartMeterId}")
+    public ResponseEntity<Map<String, Map<String, BigDecimal>>> compareUsage(@PathVariable String smartMeterId) {
+        log.info("Comparing usage for meter: {}", smartMeterId);
+
+        Optional<Map<String, Map<String, BigDecimal>>> usage = meterReadingService.compareUsage(smartMeterId);
+
+        return usage.map(ResponseEntity::ok).orElseGet(() -> {
+            log.warn("No usage comparison found for meter: {}", smartMeterId);
+            return ResponseEntity.notFound().build();
+        });
+    }
 }
