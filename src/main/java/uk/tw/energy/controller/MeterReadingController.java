@@ -10,8 +10,6 @@ import java.util.Optional;
 
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,6 +22,7 @@ import uk.tw.energy.domain.ElectricityReading;
 import uk.tw.energy.domain.MeterReadings;
 import uk.tw.energy.domain.PricePlan;
 import uk.tw.energy.service.impl.MeterReadingServiceImpl;
+import uk.tw.energy.service.MeterReadingService;
 
 @RestController
 @RequestMapping("readings/v1")
@@ -31,12 +30,10 @@ import uk.tw.energy.service.impl.MeterReadingServiceImpl;
 @Tag(name = "readings/v1", description = "API for managing meter readings")
 public class MeterReadingController {
 
-    private final MeterReadingServiceImpl meterReadingServiceImpl;
+    private final MeterReadingService meterReadingService;
 
-    private final Logger logger = LoggerFactory.getLogger(MeterReadingController.class);
-
-    public MeterReadingController(MeterReadingServiceImpl meterReadingService) {
-        this.meterReadingServiceImpl = meterReadingService;
+    public MeterReadingController(MeterReadingService meterReadingService) {
+        this.meterReadingService = meterReadingService;
     }
 
     /**
@@ -68,8 +65,8 @@ public class MeterReadingController {
             })
     @PostMapping("/store")
     public ResponseEntity<String> storeReadings(@RequestBody @Valid MeterReadings meterReadings) {
-        logger.info("Received meter readings for meter: {}", meterReadings.smartMeterId());
-        meterReadingServiceImpl.storeReadings(meterReadings.smartMeterId(), meterReadings.electricityReadings());
+        log.info("Received meter readings for meter: {}", meterReadings.smartMeterId());
+        meterReadingService.storeReadings(meterReadings.smartMeterId(), meterReadings.electricityReadings());
 
         return ResponseEntity.status(HttpStatus.CREATED).body("Meter readings stored successfully");
     }
@@ -111,12 +108,12 @@ public class MeterReadingController {
     @GetMapping("/read/{smartMeterId}")
     public ResponseEntity<List<ElectricityReading>> readReadings(@PathVariable String smartMeterId) {
 
-        logger.info("Fetching readings for meter: {}", smartMeterId);
-        Optional<List<ElectricityReading>> readings = meterReadingServiceImpl.getReadings(smartMeterId);
+        log.info("Fetching readings for meter: {}", smartMeterId);
+        Optional<List<ElectricityReading>> readings = meterReadingService.getReadings(smartMeterId);
 
         return readings.map(ResponseEntity::ok)
                 .orElseGet(() -> {
-                    logger.warn("No readings found for meter: {}", smartMeterId);
+                    log.warn("No readings found for meter: {}", smartMeterId);
                     return ResponseEntity.notFound().build();
                 });
     }
@@ -159,11 +156,11 @@ public class MeterReadingController {
             })
     @GetMapping("/read-usage-cost/{smartMeterId}/{days}")
     public ResponseEntity<Double> readUsageCost(@PathVariable String smartMeterId, @PathVariable String days) {
-        logger.info("Fetching usage cost for meter: {}", smartMeterId);
-        Optional<Double> usageCost = meterReadingServiceImpl.getUsageCostForRequiredDays(smartMeterId, days);
+        log.info("Fetching usage cost for meter: {}", smartMeterId);
+        Optional<Double> usageCost = meterReadingService.getUsageCostForRequiredDays(smartMeterId, days);
         return usageCost.map(ResponseEntity::ok)
                 .orElseGet(() -> {
-                    logger.warn("No readings found for meter: {}", smartMeterId);
+                    log.warn("No readings found for meter: {}", smartMeterId);
                     return ResponseEntity.notFound().build();
                 });
     }

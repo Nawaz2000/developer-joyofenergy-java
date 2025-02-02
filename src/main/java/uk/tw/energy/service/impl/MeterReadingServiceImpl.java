@@ -26,8 +26,6 @@ import static uk.tw.energy.util.ElectricityUtil.isMeterReadingsValid;
 @Service
 public class MeterReadingServiceImpl implements MeterReadingService {
 
-    private static final Logger logger = LoggerFactory.getLogger(MeterReadingServiceImpl.class);
-
     /**
      * A map to store electricity readings associated with smart meters.
      */
@@ -53,7 +51,7 @@ public class MeterReadingServiceImpl implements MeterReadingService {
      */
     @Override
     public Optional<List<ElectricityReading>> getReadings(String smartMeterId) {
-        logger.debug("Getting readings for smart meter: {}", smartMeterId);
+        log.debug("Getting readings for smart meter: {}", smartMeterId);
         return Optional.ofNullable(meterAssociatedReadings.get(smartMeterId));
     }
 
@@ -62,9 +60,9 @@ public class MeterReadingServiceImpl implements MeterReadingService {
      */
     @Override
     public void storeReadings(String smartMeterId, List<ElectricityReading> electricityReadings) {
-        logger.debug("Storing readings for smart meter: {}", smartMeterId);
+        log.debug("Storing readings for smart meter: {}", smartMeterId);
         if (!isMeterReadingsValid(smartMeterId, electricityReadings)) {
-            logger.error("Invalid meter readings provided for smart meter: {}", smartMeterId);
+            log.error("Invalid meter readings provided for smart meter: {}", smartMeterId);
             throw new IllegalArgumentException("Invalid meter readings provided");
         }
 
@@ -81,7 +79,7 @@ public class MeterReadingServiceImpl implements MeterReadingService {
      * @return an Optional containing the calculated usage cost as a double, or an empty Optional if the price plan for the smart meter ID is not found
      */
     public Optional<Double> getUsageCostForRequiredDays(String smartMeterId, String days) {
-        logger.info("Calculating usage cost for smart meter ID: {}", smartMeterId);
+        log.info("Calculating usage cost for smart meter ID: {}", smartMeterId);
         Optional<List<ElectricityReading>> electricityReadings = getReadings(smartMeterId);
         String pricePlanIdForSmartMeterId = accountService.getPricePlanIdForSmartMeterId(smartMeterId);
 
@@ -100,7 +98,7 @@ public class MeterReadingServiceImpl implements MeterReadingService {
 
         BigDecimal cost = ElectricityUtil.calculateCost(filteredReadings, pricePlan.get());
 
-        logger.info("Usage cost calculation: {}", cost);
+        log.info("Usage cost calculation: {}", cost);
 
         return Optional.of(cost.doubleValue());
     }

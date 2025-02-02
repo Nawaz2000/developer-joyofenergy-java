@@ -9,8 +9,6 @@ import java.util.List;
 import java.util.Random;
 
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import uk.tw.energy.domain.ElectricityReading;
 
 /**
@@ -19,8 +17,6 @@ import uk.tw.energy.domain.ElectricityReading;
 @Slf4j
 public class ElectricityReadingsGenerator {
 
-    private static final Logger logger = LoggerFactory.getLogger(ElectricityReadingsGenerator.class);
-
     /**
      * Generates a list of electricity readings with random values.
      *
@@ -28,7 +24,7 @@ public class ElectricityReadingsGenerator {
      * @return A list of electricity readings, sorted by time in ascending order.
      */
     public List<ElectricityReading> generate(int number) {
-        logger.info("Generated {} electricity readings", number);
+        log.info("Generated {} electricity readings", number);
         List<ElectricityReading> readings = new ArrayList<>();
         Instant now = Instant.now();
 
@@ -41,7 +37,7 @@ public class ElectricityReadingsGenerator {
         }
 
         readings.sort(Comparator.comparing(ElectricityReading::time));
-        readings.forEach(reading -> logger.info("Reading: {} - {}", reading.time(), reading.reading()));
+        readings.forEach(reading -> log.info("Reading: {} - {}", reading.time(), reading.reading()));
 
         return readings;
     }
