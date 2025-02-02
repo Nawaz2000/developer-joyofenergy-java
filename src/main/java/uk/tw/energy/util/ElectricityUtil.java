@@ -11,6 +11,18 @@ import lombok.extern.slf4j.Slf4j;
 import uk.tw.energy.domain.ElectricityReading;
 import uk.tw.energy.domain.PricePlan;
 
+/**
+ * Utility class for electricity-related calculations and validations.
+ *
+ * This class provides static methods for various operations related to electricity readings,
+ * including validation of meter readings, cost calculation, average reading calculation,
+ * and time elapsed calculation between readings.
+ *
+ * The class uses BigDecimal for precise calculations and includes logging for important
+ * information and warnings.
+ *
+ * This class cannot be instantiated as it only contains static utility methods.
+ */
 @Slf4j
 public class ElectricityUtil {
 
@@ -18,6 +30,13 @@ public class ElectricityUtil {
         // Private constructor to prevent instantiation
     }
 
+    /**
+     * Validates the meter readings by checking if the smart meter ID is valid and the electricity readings list is not empty.
+     *
+     * @param smartMeterId        The ID of the smart meter.
+     * @param electricityReadings The list of electricity readings.
+     * @return true if the meter readings are valid, false otherwise.
+     */
     public static boolean isMeterReadingsValid(String smartMeterId, List<ElectricityReading> electricityReadings) {
         return smartMeterId != null
                 && !smartMeterId.isEmpty()
@@ -25,6 +44,13 @@ public class ElectricityUtil {
                 && !electricityReadings.isEmpty();
     }
 
+    /**
+     * Calculates the cost of electricity consumption based on the provided readings and price plan.
+     *
+     * @param electricityReadings The list of electricity readings.
+     * @param pricePlan           The price plan to be used for cost calculation.
+     * @return The calculated cost as a BigDecimal.
+     */
     public static BigDecimal calculateCost(List<ElectricityReading> electricityReadings, PricePlan pricePlan) {
         BigDecimal average = calculateAverageReading(electricityReadings);
         BigDecimal timeElapsed = calculateTimeElapsed(electricityReadings);
@@ -36,7 +62,13 @@ public class ElectricityUtil {
         return result;
     }
 
-    public static BigDecimal calculateAverageReading(List<ElectricityReading> electricityReadings) {
+    /**
+     * Calculates the average electricity reading from a list of readings.
+     *
+     * @param electricityReadings The list of electricity readings.
+     * @return The average reading as a BigDecimal.
+     */
+    private static BigDecimal calculateAverageReading(List<ElectricityReading> electricityReadings) {
         if (electricityReadings.isEmpty()) {
             log.warn("Electricity readings list is empty, average calculation may result in an error");
         }
@@ -48,7 +80,13 @@ public class ElectricityUtil {
         return summedReadings.divide(BigDecimal.valueOf(electricityReadings.size()), RoundingMode.HALF_UP);
     }
 
-    public static BigDecimal calculateTimeElapsed(List<ElectricityReading> electricityReadings) {
+    /**
+     * Calculates the time elapsed between the first and last electricity readings.
+     *
+     * @param electricityReadings The list of electricity readings.
+     * @return The time elapsed in hours as a BigDecimal. Returns BigDecimal.ZERO if the list doesn't contain both first and last readings.
+     */
+    private static BigDecimal calculateTimeElapsed(List<ElectricityReading> electricityReadings) {
         Optional<ElectricityReading> firstOptional =
                 electricityReadings.stream().min(Comparator.comparing(ElectricityReading::time));
 
