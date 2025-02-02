@@ -1,6 +1,8 @@
 package uk.tw.energy.service;
 
+import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import uk.tw.energy.domain.ElectricityReading;
 
@@ -22,4 +24,13 @@ public interface MeterReadingService {
      * @param electricityReadings the list of electricity readings to be stored
      */
     void storeReadings(String smartMeterId, List<ElectricityReading> electricityReadings);
+
+    /**
+     * Calculates the daily energy usage for a given smart meter.
+     *
+     * @param smartMeterId the identifier of the smart meter for which the daily energy usage is to be calculated.
+     * @return an Optional containing a map where the keys are dates (as strings) and the values are the total energy
+     *         usage (as BigDecimal) for each day. If there are no readings for the given smart meter, an empty Optional is returned.
+     */
+    Optional<Map<String, BigDecimal>> getDailyEnergyUsage(String smartMeterId);
 }

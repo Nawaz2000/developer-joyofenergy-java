@@ -2,11 +2,13 @@ package uk.tw.energy.service.impl;
 
 import static uk.tw.energy.util.ElectricityUtil.isMeterReadingsValid;
 
+import java.math.BigDecimal;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.tw.energy.domain.ElectricityReading;
@@ -53,5 +55,28 @@ public class MeterReadingServiceImpl implements MeterReadingService {
         meterAssociatedReadings
                 .computeIfAbsent(smartMeterId, k -> new ArrayList<>())
                 .addAll(electricityReadings);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    @Override
+    public Optional<Map<String, BigDecimal>> getDailyEnergyUsage(String smartMeterId) {
+
+        List<ElectricityReading> electricityReadings = meterAssociatedReadings.get(smartMeterId);
+
+        if (electricityReadings == null || electricityReadings.isEmpty()) {
+            return Optional.empty();
+        }
+
+        Map<String, BigDecimal> dailyUsage = electricityReadings.stream()
+                .collect(Collectors.groupingBy(
+                        reading -> reading.time()
+                                .atZone(ZoneId.systemDefault())
+                                .toLocalDate()
+                                .toString(),
+                        Collectors.reducing(BigDecimal.ZERO, ElectricityReading::reading, BigDecimal::add)));
+
+        return Optional.of(dailyUsage);
     }
 }

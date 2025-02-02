@@ -5,10 +5,11 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import java.util.List;
-import java.util.Optional;
-
 import jakarta.validation.Valid;
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -109,10 +110,53 @@ public class MeterReadingController {
         log.info("Fetching readings for meter: {}", smartMeterId);
         Optional<List<ElectricityReading>> readings = meterReadingService.getReadings(smartMeterId);
 
-        return readings.map(ResponseEntity::ok)
-                .orElseGet(() -> {
-                    log.warn("No readings found for meter: {}", smartMeterId);
-                    return ResponseEntity.notFound().build();
-                });
+        return readings.map(ResponseEntity::ok).orElseGet(() -> {
+            log.warn("No readings found for meter: {}", smartMeterId);
+            return ResponseEntity.notFound().build();
+        });
+    }
+
+    /**
+     * Retrieves daily energy usage readings for a specific meter.
+     *
+     * @param smartMeterId The unique identifier of the meter for which daily energy usage readings are to be fetched.
+     *                     This parameter is expected to be a non-null, non-empty string.
+     *
+     * @return A ResponseEntity object containing a map of daily energy usage readings.
+     *         If readings are found for the specified meter, the status code will be 200 (OK)
+     *         and the map of readings will be present in the response body.
+     *         If no readings are found for the specified meter, the status code will be 404 (NOT_FOUND)
+     *         and the response body will be empty.
+     *         If any error occurs during the retrieval process, the status code will be 500 (INTERNAL_SERVER_ERROR)
+     *         and the response body will contain an error message.
+     */
+    @Operation(
+            summary = "Get daily energy usage",
+            description = "Fetches daily energy usage readings for a specific meter")
+    @ApiResponses(
+            value = {
+                @ApiResponse(
+                        responseCode = "200",
+                        description = "Daily energy usage readings retrieved successfully",
+                        content = {@Content(mediaType = "application/json")}),
+                @ApiResponse(
+                        responseCode = "404",
+                        description = "No daily energy usage readings found for the specified meter",
+                        content = {@Content(mediaType = "application/json")}),
+                @ApiResponse(
+                        responseCode = "500",
+                        description = "Internal server error",
+                        content = {@Content(mediaType = "application/json")})
+            })
+    @GetMapping("/daily-energy-usage/{smartMeterId}")
+    public ResponseEntity<Map<String, BigDecimal>> getDailyEnergyUsageForMeter(@PathVariable String smartMeterId) {
+        log.info("Fetching daily energy usage readings for meter: {}", smartMeterId);
+
+        Optional<Map<String, BigDecimal>> dailyEnergyUsage = meterReadingService.getDailyEnergyUsage(smartMeterId);
+
+        return dailyEnergyUsage.map(ResponseEntity::ok).orElseGet(() -> {
+            log.warn("No daily energy usage readings found for meter: {}", smartMeterId);
+            return ResponseEntity.notFound().build();
+        });
     }
 }

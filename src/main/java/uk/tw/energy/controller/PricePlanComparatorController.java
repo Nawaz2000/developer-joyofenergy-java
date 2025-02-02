@@ -34,7 +34,8 @@ public class PricePlanComparatorController {
         this.accountService = accountService;
     }
 
-    @Operation(summary = "Calculate the cost for each price plan for a given smart meter ID",
+    @Operation(
+            summary = "Calculate the cost for each price plan for a given smart meter ID",
             description = "This API calculates the cost for each price plan associated with the given smart meter ID.")
     @GetMapping("/compare-all/{smartMeterId}")
     public ResponseEntity<Map<String, Object>> calculatedCostForEachPricePlan(@PathVariable String smartMeterId) {
@@ -53,14 +54,18 @@ public class PricePlanComparatorController {
         return ResponseEntity.ok(pricePlanComparisons);
     }
 
-    @Operation(summary = "Recommend the cheapest price plans for a given smart meter ID",
-            description = "This API recommends the cheapest price plans associated with the given smart meter ID. " +
-                    "The number of recommended plans can be limited using the 'limit' query parameter.")
+    @Operation(
+            summary = "Recommend the cheapest price plans for a given smart meter ID",
+            description = "This API recommends the cheapest price plans associated with the given smart meter ID. "
+                    + "The number of recommended plans can be limited using the 'limit' query parameter.")
     @GetMapping("/recommend/{smartMeterId}")
     public ResponseEntity<List<Map.Entry<String, BigDecimal>>> recommendCheapestPricePlans(
             @PathVariable String smartMeterId,
-            @Parameter(description = "Limit the number of recommended price plans. If not provided, all available plans will be returned.")
-            @RequestParam(value = "limit", required = false) Integer limit) {
+            @Parameter(
+                            description =
+                                    "Limit the number of recommended price plans. If not provided, all available plans will be returned.")
+                    @RequestParam(value = "limit", required = false)
+                    Integer limit) {
         Optional<Map<String, BigDecimal>> consumptionsForPricePlans =
                 pricePlanServiceImpl.getConsumptionCostOfElectricityReadingsForEachPricePlan(smartMeterId);
 
