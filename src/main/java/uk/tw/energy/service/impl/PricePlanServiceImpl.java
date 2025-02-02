@@ -47,4 +47,9 @@ public class PricePlanServiceImpl implements PricePlanService {
                     .collect(Collectors.toMap(PricePlan::getPlanName, t -> calculateCost(readings, t)));
         });
     }
+
+    @Override
+    public void addPricePlan(PricePlan pricePlan) {
+        pricePlans.add(pricePlan);
+    }
 }

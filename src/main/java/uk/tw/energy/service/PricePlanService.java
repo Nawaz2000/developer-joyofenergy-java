@@ -1,8 +1,10 @@
 package uk.tw.energy.service;
 
+import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.util.Map;
 import java.util.Optional;
+import uk.tw.energy.domain.PricePlan;
 
 public interface PricePlanService {
 
@@ -15,4 +17,6 @@ public interface PricePlanService {
      * given smart meter ID, the {@link Optional} will be empty.
      */
     Optional<Map<String, BigDecimal>> getConsumptionCostOfElectricityReadingsForEachPricePlan(String smartMeterId);
+
+    void addPricePlan(@NotNull PricePlan pricePlan);
 }
