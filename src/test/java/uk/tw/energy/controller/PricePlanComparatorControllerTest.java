@@ -18,7 +18,7 @@ import uk.tw.energy.service.AccountService;
 import uk.tw.energy.service.impl.MeterReadingServiceImpl;
 import uk.tw.energy.service.impl.PricePlanServiceImpl;
 
-public class PricePlanComparatorControllerTest {
+class PricePlanComparatorControllerTest {
     private static final String WORST_PLAN_ID = "worst-supplier";
     private static final String BEST_PLAN_ID = "best-supplier";
     private static final String SECOND_BEST_PLAN_ID = "second-best-supplier";
@@ -28,7 +28,7 @@ public class PricePlanComparatorControllerTest {
     private AccountService accountService;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         meterReadingServiceImpl = new MeterReadingServiceImpl(new HashMap<>());
 
         PricePlan pricePlan1 = new PricePlan(WORST_PLAN_ID, null, BigDecimal.TEN, null);
@@ -43,7 +43,7 @@ public class PricePlanComparatorControllerTest {
     }
 
     @Test
-    public void calculatedCostForEachPricePlan_happyPath() {
+    void calculatedCostForEachPricePlan_happyPath() {
         var electricityReading = new ElectricityReading(Instant.now().minusSeconds(3600), BigDecimal.valueOf(15.0));
         var otherReading = new ElectricityReading(Instant.now(), BigDecimal.valueOf(5.0));
         meterReadingServiceImpl.storeReadings(SMART_METER_ID, List.of(electricityReading, otherReading));
@@ -63,14 +63,14 @@ public class PricePlanComparatorControllerTest {
     }
 
     @Test
-    public void calculatedCostForEachPricePlan_noReadings() {
+    void calculatedCostForEachPricePlan_noReadings() {
         ResponseEntity<Map<String, Object>> response = controller.calculatedCostForEachPricePlan("not-found");
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
     }
 
     @Test
-    public void recommendCheapestPricePlans_noLimit() {
+    void recommendCheapestPricePlans_noLimit() {
         var electricityReading = new ElectricityReading(Instant.now().minusSeconds(1800), BigDecimal.valueOf(35.0));
         var otherReading = new ElectricityReading(Instant.now(), BigDecimal.valueOf(3.0));
         meterReadingServiceImpl.storeReadings(SMART_METER_ID, List.of(electricityReading, otherReading));
@@ -87,7 +87,7 @@ public class PricePlanComparatorControllerTest {
     }
 
     @Test
-    public void recommendCheapestPricePlans_withLimit() {
+    void recommendCheapestPricePlans_withLimit() {
         var electricityReading = new ElectricityReading(Instant.now().minusSeconds(2700), BigDecimal.valueOf(5.0));
         var otherReading = new ElectricityReading(Instant.now(), BigDecimal.valueOf(20.0));
         meterReadingServiceImpl.storeReadings(SMART_METER_ID, List.of(electricityReading, otherReading));
@@ -102,7 +102,7 @@ public class PricePlanComparatorControllerTest {
     }
 
     @Test
-    public void recommendCheapestPricePlans_limitHigherThanNumberOfEntries() {
+    void recommendCheapestPricePlans_limitHigherThanNumberOfEntries() {
         var reading0 = new ElectricityReading(Instant.now().minusSeconds(3600), BigDecimal.valueOf(25.0));
         var reading1 = new ElectricityReading(Instant.now(), BigDecimal.valueOf(3.0));
         meterReadingServiceImpl.storeReadings(SMART_METER_ID, List.of(reading0, reading1));

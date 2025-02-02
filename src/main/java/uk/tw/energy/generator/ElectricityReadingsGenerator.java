@@ -17,6 +17,8 @@ import uk.tw.energy.domain.ElectricityReading;
 @Slf4j
 public class ElectricityReadingsGenerator {
 
+    private final Random readingRandomiser = new Random();
+
     /**
      * Generates a list of electricity readings with random values.
      *
@@ -28,7 +30,6 @@ public class ElectricityReadingsGenerator {
         List<ElectricityReading> readings = new ArrayList<>();
         Instant now = Instant.now();
 
-        Random readingRandomiser = new Random();
         for (int i = 0; i < number; i++) {
             double positiveRandomValue = Math.abs(readingRandomiser.nextGaussian());
             BigDecimal randomReading = BigDecimal.valueOf(positiveRandomValue).setScale(4, RoundingMode.CEILING);

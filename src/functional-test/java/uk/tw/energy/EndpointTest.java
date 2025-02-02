@@ -21,7 +21,7 @@ import uk.tw.energy.domain.ElectricityReading;
 import uk.tw.energy.domain.MeterReadings;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = App.class)
-public class EndpointTest {
+class EndpointTest {
 
     @Autowired
     private TestRestTemplate restTemplate;
@@ -33,7 +33,7 @@ public class EndpointTest {
     }
 
     @Test
-    public void shouldStoreReadings() {
+    void shouldStoreReadings() {
         MeterReadings meterReadings =
                 new MeterReadingsBuilder().generateElectricityReadings().build();
         HttpEntity<MeterReadings> entity = toHttpEntity(meterReadings);
@@ -45,7 +45,7 @@ public class EndpointTest {
 
     @SuppressWarnings("DataFlowIssue")
     @Test
-    public void givenMeterIdShouldReturnAMeterReadingAssociatedWithMeterId() {
+    void givenMeterIdShouldReturnAMeterReadingAssociatedWithMeterId() {
         String smartMeterId = "alice";
         List<ElectricityReading> data = List.of(
                 new ElectricityReading(Instant.parse("2024-04-26T00:00:10.00Z"), new BigDecimal(10)),
@@ -61,7 +61,7 @@ public class EndpointTest {
     }
 
     @Test
-    public void shouldCalculateAllPrices() {
+    void shouldCalculateAllPrices() {
         String smartMeterId = "bob";
         List<ElectricityReading> data = List.of(
                 new ElectricityReading(Instant.parse("2024-04-26T00:00:10.00Z"), new BigDecimal(10)),
@@ -80,7 +80,7 @@ public class EndpointTest {
 
     @SuppressWarnings("rawtypes")
     @Test
-    public void givenMeterIdAndLimitShouldReturnRecommendedCheapestPricePlans() {
+    void givenMeterIdAndLimitShouldReturnRecommendedCheapestPricePlans() {
         String smartMeterId = "jane";
         List<ElectricityReading> data = List.of(
                 new ElectricityReading(Instant.parse("2024-04-26T00:00:10.00Z"), new BigDecimal(10)),

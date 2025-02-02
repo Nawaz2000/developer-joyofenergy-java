@@ -9,22 +9,22 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import uk.tw.energy.service.impl.MeterReadingServiceImpl;
 
-public class MeterReadingServiceTest {
+class MeterReadingServiceTest {
 
     private MeterReadingServiceImpl meterReadingServiceImpl;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         meterReadingServiceImpl = new MeterReadingServiceImpl(new HashMap<>());
     }
 
     @Test
-    public void givenMeterIdThatDoesNotExistShouldReturnNull() {
+    void givenMeterIdThatDoesNotExistShouldReturnNull() {
         assertThat(meterReadingServiceImpl.getReadings("unknown-id")).isEqualTo(Optional.empty());
     }
 
     @Test
-    public void givenMeterReadingThatExistsShouldReturnMeterReadings() {
+    void givenMeterReadingThatExistsShouldReturnMeterReadings() {
         meterReadingServiceImpl.storeReadings("random-id", new ArrayList<>());
         assertThat(meterReadingServiceImpl.getReadings("random-id")).isEqualTo(Optional.of(new ArrayList<>()));
     }
