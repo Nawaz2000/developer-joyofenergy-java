@@ -5,10 +5,9 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import java.util.List;
 import java.util.Optional;
-
-import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -109,10 +108,9 @@ public class MeterReadingController {
         log.info("Fetching readings for meter: {}", smartMeterId);
         Optional<List<ElectricityReading>> readings = meterReadingService.getReadings(smartMeterId);
 
-        return readings.map(ResponseEntity::ok)
-                .orElseGet(() -> {
-                    log.warn("No readings found for meter: {}", smartMeterId);
-                    return ResponseEntity.notFound().build();
-                });
+        return readings.map(ResponseEntity::ok).orElseGet(() -> {
+            log.warn("No readings found for meter: {}", smartMeterId);
+            return ResponseEntity.notFound().build();
+        });
     }
 }

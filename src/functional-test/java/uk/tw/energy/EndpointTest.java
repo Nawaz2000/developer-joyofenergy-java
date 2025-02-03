@@ -70,7 +70,7 @@ class EndpointTest {
         populateReadingsForMeter(smartMeterId, data);
 
         ResponseEntity<CompareAllResponse> response =
-                restTemplate.getForEntity("/price-plans/compare-all/" + smartMeterId, CompareAllResponse.class);
+                restTemplate.getForEntity("/price-plans/v1/compare-all/" + smartMeterId, CompareAllResponse.class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody())
@@ -89,7 +89,7 @@ class EndpointTest {
         populateReadingsForMeter(smartMeterId, data);
 
         ResponseEntity<Map[]> response =
-                restTemplate.getForEntity("/price-plans/recommend/" + smartMeterId + "?limit=2", Map[].class);
+                restTemplate.getForEntity("/price-plans/v1/recommend/" + smartMeterId + "?limit=2", Map[].class);
 
         assertThat(response.getBody()).containsExactly(Map.of("price-plan-2", 3600), Map.of("price-plan-1", 7200));
     }

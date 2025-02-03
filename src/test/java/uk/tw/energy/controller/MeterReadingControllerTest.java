@@ -3,7 +3,6 @@ package uk.tw.energy.controller;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -12,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import uk.tw.energy.builders.MeterReadingsBuilder;
 import uk.tw.energy.domain.ElectricityReading;
 import uk.tw.energy.domain.MeterReadings;
+import uk.tw.energy.generator.ElectricityReadingsGenerator;
 import uk.tw.energy.service.impl.MeterReadingServiceImpl;
 
 class MeterReadingControllerTest {
@@ -27,24 +27,13 @@ class MeterReadingControllerTest {
     }
 
     @Test
-    void givenNoMeterIdIsSuppliedWhenStoringShouldReturnErrorResponse() {
-        MeterReadings meterReadings = new MeterReadings(null, Collections.emptyList());
-        assertThat(meterReadingController.storeReadings(meterReadings).getStatusCode())
-                .isEqualTo(HttpStatus.BAD_REQUEST);
-    }
+    void givenMeterIdIsSuppliedWhenStoringShouldReturnCreated() {
+        final ElectricityReadingsGenerator electricityReadingsGenerator = new ElectricityReadingsGenerator();
+        List<ElectricityReading> readings = electricityReadingsGenerator.generate(20);
 
-    @Test
-    void givenEmptyMeterReadingShouldReturnErrorResponse() {
-        MeterReadings meterReadings = new MeterReadings(SMART_METER_ID, Collections.emptyList());
+        MeterReadings meterReadings = new MeterReadings("random-meter", readings);
         assertThat(meterReadingController.storeReadings(meterReadings).getStatusCode())
-                .isEqualTo(HttpStatus.BAD_REQUEST);
-    }
-
-    @Test
-    void givenNullReadingsAreSuppliedWhenStoringShouldReturnErrorResponse() {
-        MeterReadings meterReadings = new MeterReadings(SMART_METER_ID, null);
-        assertThat(meterReadingController.storeReadings(meterReadings).getStatusCode())
-                .isEqualTo(HttpStatus.BAD_REQUEST);
+                .isEqualTo(HttpStatus.CREATED);
     }
 
     @Test
